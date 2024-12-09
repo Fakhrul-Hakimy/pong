@@ -17,8 +17,8 @@ The project consists of the following main files:
 - **`index.php`**: The landing page and Login page where users authenticate with their email and password.
 - **`register.php`**: Registration page where users create an account.
 - **`main.php`**: The main dashboard page after the user logs in, displaying their email and profile.
-- **`profile.php`**: Page where users can update their profile details (name and password).
-- **`logout.php`**: Logs the user out and redirects them to the login page.
+- **`profile.php`**: Page where users can update their profile details (name and password) and users can delete their account.
+- **`logout.php`**: Logs the user out and redirects them to the index page(login page).
 - **`db.php`**: Database connection file used across all pages to manage the connection to the MySQL database.
 
 ## Requirements
