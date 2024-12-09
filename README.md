@@ -14,8 +14,7 @@ A simple web-based Pong game with user authentication and profile management. Th
 
 The project consists of the following main files:
 
-- **`index.html`**: The landing page.
-- **`login.php`**: Login page where users authenticate with their email and password.
+- **`index.php`**: The landing page and Login page where users authenticate with their email and password.
 - **`register.php`**: Registration page where users create an account.
 - **`main.php`**: The main dashboard page after the user logs in, displaying their email and profile.
 - **`profile.php`**: Page where users can update their profile details (name and password).
@@ -35,5 +34,5 @@ Follow these steps to get your environment running:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/game-pong.git
-cd game-pong
+git clone https://github.com/Fakhrul-Hakimy/pong.git
+cd pong
