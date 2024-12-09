@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Two-Player Pong Game</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <!-- HTML Section: Structure for canvas and score display -->
+    <div class="score">
+        <span id="pingScore">Ping Score: 0</span>
+        <span id="pongScore">Pong Score: 0</span>
+    </div>
+    <canvas id="pongCanvas" width="800" height="600"></canvas>
+
+    <!-- JavaScript Section: Game logic, player name prompts, and score-saving functions -->
+    <script>
+        const player1Name = prompt("Enter Player 1 Name:");
+        const player2Name = prompt("Enter Player 2 Name:");
+
+        const canvas = document.getElementById("pongCanvas");
+        const context = canvas.getContext("2d");
+        const pingScoreElement = document.getElementById("pingScore");
+        const pongScoreElement = document.getElementById("pongScore");
+
+        // Paddle settings
+        const paddleWidth = 10, paddleHeight = 100;
+        const playerSpeed = 5;
+
+        // Paddle positions
+        const player1 = { x: 10, y: canvas.height / 2 - paddleHeight / 2, dy: 0 };
+        const player2 = { x: canvas.width - 20, y: canvas.height / 2 - paddleHeight / 2, dy: 0 };
+
+        // Ball settings
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speedX: 3,
+            speedY: 3
+        };
+
+        // Scores
+        let pingScore = 0;
+        let pongScore = 0;
+
+        function drawPaddle(x, y, color) {
+            context.fillStyle = color;
+            context.fillRect(x, y, paddleWidth, paddleHeight);
+        }
+
+        function drawBall(x, y) {
+            context.beginPath();
+            context.arc(x, y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = "red";
+            context.fill();
+            context.closePath();
+        }
+
+        function updateBall() {
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
+
+            if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
+                ball.speedY = -ball.speedY;
+            }
+
+            if (ball.x - ball.radius <= player1.x + paddleWidth &&
+                ball.y > player1.y && ball.y < player1.y + paddleHeight) {
+                ball.speedX = -ball.speedX;
+            }
+
+            if (ball.x + ball.radius >= player2.x &&
+                ball.y > player2.y && ball.y < player2.y + paddleHeight) {
+                ball.speedX = -ball.speedX;
+            }
+
+            if (ball.x < 0) {
+                pongScore++;
+                updateScores();
+                resetBall();
+            }
+
+            if (ball.x > canvas.width) {
+                pingScore++;
+                updateScores();
+                resetBall();
+            }
+        }
+
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speedX = 3 * (Math.random() < 0.5 ? 1 : -1);
+            ball.speedY = 3 * (Math.random() < 0.5 ? 1 : -1);
+        }
+
+        function updateScores() {
+            pingScoreElement.textContent = `${player1Name} Score: ${pingScore}`;
+            pongScoreElement.textContent = `${player2Name} Score: ${pongScore}`;
+        }
+
+        function updatePlayers() {
+            player1.y += player1.dy;
+            player2.y += player2.dy;
+
+            if (player1.y < 0) player1.y = 0;
+            if (player1.y + paddleHeight > canvas.height) player1.y = canvas.height - paddleHeight;
+
+            if (player2.y < 0) player2.y = 0;
+            if (player2.y + paddleHeight > canvas.height) player2.y = canvas.height - paddleHeight;
+        }
+
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddle(player1.x, player1.y, "blue");
+            drawPaddle(player2.x, player2.y, "green");
+            drawBall(ball.x, ball.y);
+        }
+
+        function gameLoop() {
+            updatePlayers();
+            updateBall();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Event listeners
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "w") player1.dy = -playerSpeed;
+            if (e.key === "s") player1.dy = playerSpeed;
+            if (e.key === "ArrowUp") player2.dy = -playerSpeed;
+            if (e.key === "ArrowDown") player2.dy = playerSpeed;
+        });
+
+        document.addEventListener("keyup", (e) => {
+            if (e.key === "w" || e.key === "s") player1.dy = 0;
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") player2.dy = 0;
+        });
+
+        function saveScores() {
+            const formData = new FormData();
+            formData.append('player1Name', player1Name);
+            formData.append('player2Name', player2Name);
+            formData.append('pingScore', pingScore);
+            formData.append('pongScore', pongScore);
+
+            fetch('saveScores.php', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.text())
+              .then(data => console.log(data))
+              .catch(error => console.error('Error:', error));
+        }
+
+        window.addEventListener('beforeunload', saveScores);
+
+        gameLoop();
+    </script>
+</body>
+</html>
