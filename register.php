@@ -8,12 +8,13 @@ $success_message = ''; // Store success message
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name']; // New field
     $email = $_POST['email'];
     $pass = $_POST['password'];
     $confirm_pass = $_POST['confirm_password'];
 
     // Validate input
-    if (empty($email) || empty($pass) || empty($confirm_pass)) {
+    if (empty($name) || empty($email) || empty($pass) || empty($confirm_pass)) {
         $error_message = "Please fill all details.";
     } elseif ($pass !== $confirm_pass) {
         $error_message = "Passwords do not match.";
@@ -31,8 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
             // Insert new user into the database
-            $stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
-            $stmt->bind_param("ss", $email, $hashed_password);
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $name, $email, $hashed_password);
 
             if ($stmt->execute()) {
                 $success_message = "Registration successful! You can now log in.";
@@ -47,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
+
 $conn->close();
 ?>
 
@@ -56,25 +58,57 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Custom styling */
         body {
-            
-            background-size: cover;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-family: 'Arial', sans-serif;
+            color: #fff;
         }
-        .card-container {
+        .card {
+            background: #fff;
+            color: #333;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 100%;
             max-width: 400px;
-            margin: 100px auto;
         }
-        .card-body {
-            padding: 30px;
+        .card-header {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 20px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
         }
         .btn-custom {
-            width: 100%;
-            margin-top: 20px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+        }
+        .form-control {
+            border-radius: 25px;
         }
         .alert {
-            margin-top: 20px;
+            margin-top: 15px;
+            border-radius: 25px;
+        }
+        .text-center a {
+            color: #6a11cb;
+            font-weight: bold;
+        }
+        .text-center a:hover {
+            text-decoration: none;
         }
         .eye-icon {
             cursor: pointer;
@@ -82,50 +116,53 @@ $conn->close();
     </style>
 </head>
 <body>
-    <div class="card-container">
-        <div class="card">
-            <div class="card-header text-center">
-                <h3>Register</h3>
+    <div class="card">
+        <div class="card-header">
+            Register
+        </div>
+        <div class="card-body">
+            <!-- Display error or success message -->
+            <?php if (!empty($error_message)) { echo "<div class='alert alert-danger'>$error_message</div>"; } ?>
+            <?php if (!empty($success_message)) { echo "<div class='alert alert-success'>$success_message</div>"; } ?>
+
+            <!-- Registration form -->
+            <form method="POST" action="">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="password" name="password" required>
+            <div class="input-group-append">
+                <span class="input-group-text eye-icon" id="togglePassword1">
+                    <i class="fas fa-eye"></i>
+                </span>
             </div>
-            <div class="card-body">
-                <!-- Display error or success message -->
-                <?php if (!empty($error_message)) { echo "<div class='alert alert-danger'>$error_message</div>"; } ?>
-                <?php if (!empty($success_message)) { echo "<div class='alert alert-success'>$success_message</div>"; } ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            <div class="input-group-append">
+                <span class="input-group-text eye-icon" id="togglePassword2">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-custom btn-block" type="submit">Register</button>
+</form>
 
-                <!-- Registration form -->
-                <form method="POST" action="">
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="password" required>
-                            <div class="input-group-append">
-                                <span class="input-group-text eye-icon" id="togglePassword1">
-                                    <i class="fas fa-eye"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm_password">Confirm Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                            <div class="input-group-append">
-                                <span class="input-group-text eye-icon" id="togglePassword2">
-                                    <i class="fas fa-eye"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary btn-custom" type="submit">Register</button>
-                </form>
 
-                <div class="text-center mt-3">
-                    <a href="index.php" class="btn btn-link">Already have an account? Login here</a>
-                </div>
+            <div class="text-center mt-3">
+                <a href="index.php">Already have an account? Login here</a>
             </div>
         </div>
     </div>

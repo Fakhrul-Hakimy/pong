@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql": "^2.18.1",
+    "node-php": "^0.0.1",
+    "socket.io": "^4.8.1",
+    "ws": "^8.18.0"
+  },
+  "name": "game",
+  "version": "1.0.0",
+  "description": "A simple web-based Pong game with user authentication and profile management. This project allows users to log in, play the game, update their profile, and delete their account.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

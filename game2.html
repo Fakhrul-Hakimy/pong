@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Two-Player Offline Pong Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            height: 100vh;
+            margin: 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .score {
+            display: flex;
+            justify-content: space-around;
+            width: 60%;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        #pongCanvas {
+            border: 2px solid white;
+            background: black;
+        }
+        .player2-input {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Two-Player Online Pong Game</h1>
+        <p>Player 1: Use W/S | Player 2: Use Arrow Keys</p>
+    </div>
+    <div class="player2-input">
+        <label for="player2Name">Enter Player 2 Name:</label>
+        <input type="text" id="player2Name" placeholder="Player 2 Name" />
+        <button id="startGame" class="btn btn-primary">Start Game</button>
+        <a href="main.php" >
+        <button class="btn btn-primary">Menu</button></a>
+    </div>
+    <div class="score">
+        <span id="pingScore">Ping Score: 0</span>
+        <span id="pongScore">Pong Score: 0</span>
+    </div>
+    <canvas id="pongCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("pongCanvas");
+        const context = canvas.getContext("2d");
+
+        const paddleWidth = 10, paddleHeight = 100;
+        const playerSpeed = 3;
+        const winScore = 5;
+
+        const player1 = { x: 10, y: 250, dy: 0, name: "" };
+        const player2 = { x: canvas.width - 20, y: 250, dy: 0, name: "" };
+        const ball = { x: 400, y: 300, speedX: 1, speedY: 1, radius: 10 };
+
+        let pingScore = 0;
+        let pongScore = 0;
+        let gameRunning = false;
+
+        // Fetch Player 1's name from the backend
+        function fetchPlayer1Name() {
+            return fetch("fetch_player1_name.php")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.player1_name) {
+                        player1.name = data.player1_name; // Set Player 1's name
+                        console.log("Player 1 name fetched:", player1.name);
+                    } else {
+                        console.error("Error fetching Player 1 name:", data.error);
+                        player1.name = "Player 1"; // Default fallback
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching Player 1 name:", error);
+                    player1.name = "Player 1"; // Default fallback
+                });
+        }
+
+        document.getElementById("startGame").addEventListener("click", () => {
+            const player2Name = document.getElementById("player2Name").value;
+            if (!player2Name) {
+                alert("Please enter Player 2 name.");
+                return;
+            }
+
+            player2.name = player2Name;
+            document.querySelector(".player2-input").style.display = "none";
+            gameRunning = true;
+        });
+
+        function saveGameState() {
+            const formData = new FormData();
+            formData.append("player1_name", player1.name);
+            formData.append("player2_name", player2.name);
+            formData.append("ping_score", pingScore);
+            formData.append("pong_score", pongScore);
+
+            fetch("save_game.php", { method: "POST", body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Final scores saved successfully.");
+                    } else {
+                        console.error("Error saving final scores:", data.error);
+                    }
+                })
+                .catch(error => console.error("Error saving final scores:", error));
+        }
+
+        function drawPaddle(x, y, color) {
+            context.fillStyle = color;
+            context.fillRect(x, y, paddleWidth, paddleHeight);
+        }
+
+        function drawBall(x, y) {
+            context.beginPath();
+            context.arc(x, y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = "red";
+            context.fill();
+            context.closePath();
+        }
+
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddle(player1.x, player1.y, "blue");
+            drawPaddle(player2.x, player2.y, "green");
+            drawBall(ball.x, ball.y);
+        }
+
+        function updateBall() {
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
+
+            if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
+                ball.speedY = -ball.speedY;
+            }
+
+            if (ball.x - ball.radius <= player1.x + paddleWidth &&
+                ball.y > player1.y && ball.y < player1.y + paddleHeight) {
+                ball.speedX = -ball.speedX;
+            }
+
+            if (ball.x + ball.radius >= player2.x &&
+                ball.y > player2.y && ball.y < player2.y + paddleHeight) {
+                ball.speedX = -ball.speedX;
+            }
+
+            if (ball.x < 0) {
+                pongScore++;
+                resetBall();
+            }
+
+            if (ball.x > canvas.width) {
+                pingScore++;
+                resetBall();
+            }
+
+            document.getElementById("pingScore").textContent = `Ping Score: ${pingScore}`;
+            document.getElementById("pongScore").textContent = `Pong Score: ${pongScore}`;
+
+            if (pingScore >= winScore || pongScore >= winScore) {
+                gameRunning = false;
+                saveGameState(); // Save final scores
+                alert(`${pingScore >= winScore ? player1.name : player2.name} wins!`);
+                resetGame();
+            }
+        }
+
+        function resetBall() {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+
+    // Set consistent speed for reset
+    const initialSpeed = 1.5; // Adjust this value for desired reset speed
+
+    ball.speedX = initialSpeed * (Math.random() < 0.5 ? 1 : -1); // Random direction for X
+    ball.speedY = initialSpeed * (Math.random() < 0.5 ? 1 : -1); // Random direction for Y
+}
+        function resetGame() {
+            pingScore = 0;
+            pongScore = 0;
+            resetBall();
+            document.getElementById("pingScore").textContent = "Ping Score: 0";
+            document.getElementById("pongScore").textContent = "Pong Score: 0";
+        }
+
+        function updatePlayers() {
+            player1.y += player1.dy;
+            player2.y += player2.dy;
+
+            player1.y = Math.max(0, Math.min(canvas.height - paddleHeight, player1.y));
+            player2.y = Math.max(0, Math.min(canvas.height - paddleHeight, player2.y));
+        }
+
+        function gameLoop() {
+            if (gameRunning) {
+                updatePlayers();
+                updateBall();
+                draw();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "w") player1.dy = -playerSpeed;
+            if (e.key === "s") player1.dy = playerSpeed;
+            if (e.key === "ArrowUp") player2.dy = -playerSpeed;
+            if (e.key === "ArrowDown") player2.dy = playerSpeed;
+        });
+
+        document.addEventListener("keyup", (e) => {
+            if (e.key === "w" || e.key === "s") player1.dy = 0;
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") player2.dy = 0;
+        });
+
+        // Fetch Player 1's name on page load and start game loop
+        fetchPlayer1Name().then(() => gameLoop());
+    </script>
+</body>
+</html>
