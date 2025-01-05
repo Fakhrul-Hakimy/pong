@@ -33,12 +33,12 @@ This repository contains a multiplayer Pong game built using HTML, CSS, JavaScri
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/multiplayer-pong-game.git
+git clone https://github.com/Fakhrul-Hakimy/pong
 ```
 
 2. Navigate to the project directory:
 ```bash
-cd multiplayer-pong-game
+cd pong
 ```
 
 3. Install Node.js dependencies:
