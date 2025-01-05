@@ -57,7 +57,7 @@ node server.js
 
 6. Start the PHP server:
    - Place the project in your local server's `htdocs` folder (e.g., `xampp/htdocs`).
-   - Access the project via `http://localhost/multiplayer-pong-game/`.
+   - Access the project via `http://localhost/pong/`.
 
 ## File Structure
 
