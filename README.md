@@ -1,38 +1,137 @@
-# Game Pong Project
+# Multiplayer Pong Game
 
-A simple web-based Pong game with user authentication and profile management. This project allows users to log in, play the game, update their profile, and delete their account.
+This repository contains a multiplayer Pong game built using HTML, CSS, JavaScript, PHP, and Node.js. The game includes features such as a real-time WebSocket server, game statistics, a leaderboard, and a user profile system with authentication.
 
 ## Features
 
-- **User Authentication**: Users can log in with their email and password.
-- **Game**: After logging in, users can play the Pong game.
-- **Profile Management**: Users can update their profile information (name and password).
-- **Account Deletion**: Users can delete their accounts.
-- **Session Management**: Once logged in, users can access their profile and the game without needing to log in again until they log out.
+- Multiplayer real-time Pong game.
+- Player profile management (edit profile, delete account).
+- Leaderboard showcasing top players by win rate.
+- Game statistics and history.
+- Chart representation of game statistics using amCharts.
 
-## Project Structure
+## Dependencies
 
-The project consists of the following main files:
+### Server-Side Dependencies
+- Node.js
+- Express
+- HTTP
+- WebSocket
+- Path
 
-- **`index.php`**: The landing page and Login page where users authenticate with their email and password.
-- **`register.php`**: Registration page where users create an account.
-- **`main.php`**: The main dashboard page after the user logs in, displaying their email and profile.
-- **`profile.php`**: Page where users can update their profile details (name and password) and users can delete their account.
-- **`logout.php`**: Logs the user out and redirects them to the index page(login page).
-- **`db.php`**: Database connection file used across all pages to manage the connection to the MySQL database.
+### Client-Side Dependencies
+- amCharts
+- Bootstrap 4
 
-## Requirements
+## Installation Guide
 
-- PHP 7 or later
-- MySQL database
-- A web server (Apache or Nginx) with PHP support
+### Prerequisites
+- Node.js installed on your system.
+- A local server environment (e.g., XAMPP, WAMP) for running PHP and MySQL.
 
-## Setup
+### Steps
 
-Follow these steps to get your environment running:
-
-### 1. Clone the repository
-
+1. Clone the repository:
 ```bash
-git clone https://github.com/Fakhrul-Hakimy/pong.git
-cd pong
+git clone https://github.com/yourusername/multiplayer-pong-game.git
+```
+
+2. Navigate to the project directory:
+```bash
+cd multiplayer-pong-game
+```
+
+3. Install Node.js dependencies:
+```bash
+npm install express ws http path
+```
+
+4. Set up the database:
+   - Import the `database.sql` file into your MySQL server.
+   - Update the `db.php` file with your database credentials.
+
+5. Start the Node.js server:
+```bash
+node server.js
+```
+
+6. Start the PHP server:
+   - Place the project in your local server's `htdocs` folder (e.g., `xampp/htdocs`).
+   - Access the project via `http://localhost/multiplayer-pong-game/`.
+
+## File Structure
+
+```
+multiplayer-pong-game/
+├── assets/
+│   ├── css/
+│   └── js/
+├── server.js
+├── index.php
+├── profile.php
+├── db.php
+├── README.md
+└── database.sql
+```
+
+## Usage
+
+### Playing the Game
+1. Open the application in your browser.
+2. Log in or register as a new user.
+3. Join or create a game room.
+4. Play the Pong game in real time.
+
+### Managing Profile
+- Edit your profile details.
+- Update your password.
+- Delete your account.
+
+### Leaderboard and Game Statistics
+- View the leaderboard based on win rate.
+- Analyze your game statistics with visual charts.
+- Browse your game history with pagination.
+
+## API Endpoints
+
+### Node.js Server
+- WebSocket endpoint: `ws://localhost:8080`
+- Handles real-time game communication.
+
+### PHP Backend
+- User authentication and profile management.
+- Fetching leaderboard and game history.
+- Saving and retrieving game data.
+
+## Dependencies
+### Node.js Libraries
+- `express`
+- `ws`
+- `http`
+- `path`
+
+### Front-End Libraries
+- `Bootstrap 4`
+- `amCharts`
+
+## License
+This project is licensed under the MIT License.
+
+
+## Contributing
+
+We welcome contributions! Please fork the repository, create a feature branch, and submit a pull request.
+
+---
+
+## License
+
+This project is licensed under the MIT License. Feel free to modify and distribute it as needed.
+
+---
+
+## Contact
+
+For any issues or suggestions, please contact us at [fakhrulhakimy93@gmail.com](mailto:fakhrulhakimy93@gmail.com).
+```
+
